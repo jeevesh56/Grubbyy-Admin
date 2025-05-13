@@ -1,34 +1,43 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:developer';
+import 'widgets/order_summary_card.dart';
+import 'widgets/revenue_chart.dart';
+import 'widgets/recent_orders_table.dart';
+import 'widgets/food_orders_table.dart';
 
 class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    log('Rendering DashboardScreen');
     return Scaffold(
       appBar: AppBar(
         title: Text('Admin Dashboard'),
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('testCollection').snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(child: Text('No data found'));
-          }
-          final documents = snapshot.data!.docs;
-          return ListView.builder(
-            itemCount: documents.length,
-            itemBuilder: (context, index) {
-              final data = documents[index].data() as Map<String, dynamic>;
-              return ListTile(
-                title: Text(data['title'] ?? 'No Title'),
-                subtitle: Text(data['description'] ?? 'No Description'),
-              );
-            },
-          );
-        },
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Welcome to the Admin Dashboard',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 20),
+            Expanded(
+              child: GridView.count(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                children: [
+                  OrderSummaryCard(),
+                  RevenueChart(),
+                  RecentOrdersTable(),
+                  FoodOrdersTable(),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
